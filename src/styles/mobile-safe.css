@@ -1,0 +1,638 @@
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  overscroll-behavior-x: none;
+}
+
+*,
+*::before,
+*::after {
+  min-width: 0;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+.nexus-app,
+.hero-section,
+.lab-workspace,
+.workspace-grid,
+.workspace-center,
+.workspace-right,
+.lab-sidebar,
+.advanced-field,
+.equation-board,
+.meaning-panel,
+.complexity-panel,
+.parameter-matrix,
+.ai-console,
+.formula-explorer,
+.research-wall,
+.research-grid,
+.research-card,
+.system-dock {
+  max-width: 100%;
+}
+
+.system-dock {
+  overflow: hidden;
+}
+
+.dock-metrics,
+.dock-actions,
+.category-scroll,
+.frontier-strip,
+.lab-list,
+.formula-list,
+.notification-list,
+.ai-answer,
+.ai-history,
+.section-list {
+  -webkit-overflow-scrolling: touch;
+}
+
+.dock-metrics,
+.dock-actions,
+.category-scroll,
+.frontier-strip {
+  scrollbar-width: none;
+}
+
+.dock-metrics::-webkit-scrollbar,
+.dock-actions::-webkit-scrollbar,
+.category-scroll::-webkit-scrollbar,
+.frontier-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.hero-main h1,
+.workspace-title h2,
+.research-hero h2,
+.field-title-card h2,
+.equation-board h2,
+.nexus-boot-card h1 {
+  overflow-wrap: anywhere;
+}
+
+.hero-main p,
+.field-title-card span,
+.equation-board > div > span,
+.research-hero span,
+.professor-note p,
+.parameter-slider p,
+.ai-answer,
+.ai-history p,
+.notification-item p,
+.research-card p {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 820px) {
+  .nexus-app,
+  .nexus-app.compact {
+    width: 100%;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .system-dock {
+    left: 0.35rem;
+    right: 0.35rem;
+    transform: none;
+    width: auto;
+    max-width: calc(100vw - 0.7rem);
+  }
+
+  .dock-brand {
+    min-width: 0;
+  }
+
+  .dock-brand section {
+    min-width: 0;
+  }
+
+  .dock-brand strong,
+  .dock-brand span {
+    max-width: 42vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dock-metrics,
+  .dock-actions {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.1rem;
+  }
+
+  .dock-actions {
+    display: flex;
+    flex-wrap: nowrap;
+  }
+
+  .dock-actions > button,
+  .notification-center {
+    flex: 0 0 auto;
+  }
+
+  .notification-toggle {
+    display: none;
+  }
+
+  .hero-section {
+    gap: 0.75rem;
+  }
+
+  .hero-kicker {
+    max-width: 100%;
+  }
+
+  .hero-kicker span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .hero-main {
+    gap: 0.85rem;
+  }
+
+  .hero-main h1 {
+    max-width: 100%;
+    font-size: clamp(2.35rem, 12vw, 4rem);
+    line-height: 0.92;
+  }
+
+  .hero-main p {
+    max-width: 100%;
+    font-size: 0.94rem;
+  }
+
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+  }
+
+  .hero-actions a {
+    min-height: 2.75rem;
+    padding: 0.7rem 0.8rem;
+    border-radius: 0.9rem;
+  }
+
+  .hero-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .hero-stats div {
+    padding: 0.72rem;
+    border-radius: 1rem;
+  }
+
+  .hero-stats strong {
+    font-size: 1.1rem;
+  }
+
+  .hero-stats span {
+    font-size: 0.76rem;
+  }
+
+  .frontier-strip {
+    gap: 0.45rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .frontier-strip button {
+    max-width: 78vw;
+    padding: 0.58rem 0.7rem;
+  }
+
+  .frontier-strip button span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .workspace-title {
+    gap: 0.65rem;
+  }
+
+  .workspace-badges {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .workspace-badges span {
+    justify-content: center;
+    padding: 0.52rem;
+    font-size: 0.78rem;
+  }
+
+  .lab-sidebar {
+    overflow: visible;
+  }
+
+  .sidebar-head {
+    align-items: center;
+  }
+
+  .category-scroll {
+    max-width: 100%;
+  }
+
+  .level-radar {
+    display: none;
+  }
+
+  .lab-list {
+    display: flex;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 0.55rem;
+    padding-bottom: 0.15rem;
+  }
+
+  .lab-button {
+    min-width: 235px;
+    max-width: 235px;
+    padding: 0.65rem;
+    border-radius: 1rem;
+  }
+
+  .lab-button h3 {
+    font-size: 0.85rem;
+  }
+
+  .lab-button p {
+    font-size: 0.72rem;
+  }
+
+  .lab-button-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.8rem;
+  }
+
+  .advanced-field,
+  .advanced-field-overlay,
+  .nexus-app.compact .advanced-field,
+  .nexus-app.compact .advanced-field-overlay {
+    min-height: 410px;
+  }
+
+  .field-title-card {
+    max-width: 100%;
+    padding: 0.72rem;
+  }
+
+  .field-title-card p {
+    font-size: 0.66rem;
+  }
+
+  .field-title-card h2 {
+    margin: 0.18rem 0 0.28rem;
+    font-size: 1.22rem;
+    line-height: 1.05;
+  }
+
+  .field-title-card span {
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .metric-dock {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .metric-dock div,
+  .equation-metrics article {
+    padding: 0.58rem;
+    border-radius: 0.82rem;
+  }
+
+  .workspace-lower-grid {
+    gap: 0.75rem;
+  }
+
+  .panel-head {
+    gap: 0.7rem;
+  }
+
+  .panel-head h2 {
+    font-size: 1.18rem;
+  }
+
+  .parameter-slider {
+    padding: 0.68rem;
+    border-radius: 0.95rem;
+  }
+
+  .parameter-slider p {
+    font-size: 0.78rem;
+  }
+
+  .mode-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mode-grid button {
+    min-height: 2.4rem;
+  }
+
+  textarea {
+    min-height: 7rem;
+    font-size: 0.92rem;
+    border-radius: 1rem;
+  }
+
+  .primary-button {
+    min-height: 2.75rem;
+    border-radius: 1rem;
+  }
+
+  .active-equation {
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+  }
+
+  .active-equation .icon-button {
+    width: 100%;
+  }
+
+  .formula-list {
+    max-height: 190px;
+  }
+
+  .formula-item {
+    padding: 0.62rem;
+  }
+
+  .formula-detail h3 {
+    font-size: 1.08rem;
+  }
+
+  .equation-board {
+    gap: 0.75rem;
+  }
+
+  .equation-board h2 {
+    font-size: 1.2rem;
+    line-height: 1.25;
+  }
+
+  .equation-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .meaning-list article {
+    padding: 0.68rem;
+    border-radius: 0.9rem;
+  }
+
+  .complexity-panel h3 {
+    font-size: 1.05rem;
+  }
+
+  .research-grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .research-card {
+    min-height: 0;
+    padding: 0.78rem;
+    border-radius: 1rem;
+  }
+
+  .research-card h3 {
+    margin: 0.75rem 0 0.35rem;
+    font-size: 1rem;
+  }
+
+  .research-card p {
+    font-size: 0.84rem;
+  }
+
+  .research-hero h2 {
+    font-size: 1.55rem;
+  }
+
+  .research-hero span {
+    font-size: 0.9rem;
+  }
+
+  .professor-note {
+    padding: 0.78rem;
+  }
+
+  .workspace-footer-note {
+    font-size: 0.84rem;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 480px) {
+  .nexus-app,
+  .nexus-app.compact {
+    padding-left: 0.35rem;
+    padding-right: 0.35rem;
+    padding-top: 10.4rem;
+  }
+
+  .system-dock {
+    left: 0.25rem;
+    right: 0.25rem;
+    max-width: calc(100vw - 0.5rem);
+    padding: 0.42rem;
+  }
+
+  .dock-brand > div {
+    display: none;
+  }
+
+  .dock-brand {
+    padding: 0.25rem;
+  }
+
+  .dock-brand strong,
+  .dock-brand span {
+    max-width: 62vw;
+  }
+
+  .dock-metrics div,
+  .dock-actions button,
+  .notification-trigger {
+    min-height: 2rem;
+    padding: 0.36rem 0.48rem;
+    font-size: 0.76rem;
+  }
+
+  .hero-section {
+    padding-top: 1.4rem;
+  }
+
+  .hero-main h1 {
+    font-size: clamp(2.25rem, 13vw, 3.1rem);
+  }
+
+  .hero-main p {
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  .hero-stats {
+    gap: 0.42rem;
+  }
+
+  .hero-stats div {
+    padding: 0.62rem;
+  }
+
+  .workspace-title h2 {
+    font-size: 1.7rem;
+  }
+
+  .lab-sidebar,
+  .parameter-matrix,
+  .ai-console,
+  .formula-explorer,
+  .meaning-panel,
+  .equation-board,
+  .complexity-panel,
+  .research-wall {
+    padding: 0.68rem;
+    border-radius: 1.05rem;
+  }
+
+  .lab-button {
+    min-width: 220px;
+    max-width: 220px;
+  }
+
+  .advanced-field,
+  .advanced-field-overlay,
+  .nexus-app.compact .advanced-field,
+  .nexus-app.compact .advanced-field-overlay {
+    min-height: 370px;
+  }
+
+  .advanced-field-overlay {
+    padding: 0.5rem;
+  }
+
+  .field-title-card h2 {
+    font-size: 1.08rem;
+  }
+
+  .field-title-card span {
+    -webkit-line-clamp: 2;
+    font-size: 0.78rem;
+  }
+
+  .metric-dock span,
+  .equation-metrics span,
+  .fallback-metrics span {
+    font-size: 0.6rem;
+  }
+
+  .metric-dock strong,
+  .equation-metrics strong,
+  .fallback-metrics strong {
+    font-size: 0.78rem;
+  }
+
+  .telemetry-grid,
+  .equation-metrics,
+  .fallback-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .parameter-slider-top {
+    gap: 0.5rem;
+  }
+
+  .parameter-slider strong,
+  .parameter-slider b {
+    font-size: 0.82rem;
+  }
+
+  .ai-answer {
+    max-height: 270px;
+    font-size: 0.86rem;
+  }
+
+  .notification-popover {
+    left: 0;
+    right: auto;
+    width: calc(100vw - 0.8rem);
+    max-width: calc(100vw - 0.8rem);
+  }
+
+  .notification-item {
+    grid-template-columns: auto 1fr;
+  }
+
+  .notification-item > button {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 1.8rem;
+    border: 1px solid var(--line);
+    border-radius: 0.7rem;
+  }
+
+  .nexus-boot-card {
+    padding: 1.4rem;
+    border-radius: 1.4rem;
+  }
+
+  .nexus-boot-card h1 {
+    font-size: 1.35rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .nexus-app,
+  .nexus-app.compact {
+    padding-top: 11rem;
+  }
+
+  .hero-main h1 {
+    font-size: 2.05rem;
+  }
+
+  .hero-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .lab-button {
+    min-width: 205px;
+    max-width: 205px;
+  }
+
+  .advanced-field,
+  .advanced-field-overlay,
+  .nexus-app.compact .advanced-field,
+  .nexus-app.compact .advanced-field-overlay {
+    min-height: 345px;
+  }
+
+  .metric-dock {
+    grid-template-columns: 1fr;
+  }
+}
