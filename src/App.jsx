@@ -10,6 +10,7 @@ import { useLabStore } from "@/store/useLabStore";
 import "@/styles/premium.css";
 import "@/styles/final.css";
 import "@/styles/polish.css";
+import "@/styles/refined-ui.css";
 import "@/styles/mobile-safe.css";
 
 export default function App() {
@@ -27,9 +28,9 @@ export default function App() {
     const timer = setTimeout(() => {
       setBooting(false);
       toast.success("Nexus Axiom Lab aktif", {
-        description: "Semua simulasi, AI, notifikasi, dan kontrol real-time siap digunakan."
+        description: "Simulasi realistis, AI Indonesia, preset, dan kontrol real-time siap digunakan."
       });
-    }, 950);
+    }, 820);
 
     return () => clearTimeout(timer);
   }, []);
@@ -38,11 +39,11 @@ export default function App() {
     <main className={cinematic ? "nexus-app cinematic" : "nexus-app compact"}>
       <AnimatePresence>
         {booting && (
-          <motion.div className="nexus-boot" initial={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
+          <motion.div className="nexus-boot" initial={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.42 }}>
             <motion.div className="nexus-boot-card" initial={{ scale: 0.94, y: 18 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.98, y: -12 }}>
-              <Loader2 className="spin" size={42} />
+              <Loader2 className="spin" size={36} />
               <h1>Initializing Nexus Axiom Lab</h1>
-              <p>Memuat medan kuantum, jaringan rumus, AI professor, dan visual engine adaptif.</p>
+              <p>Memuat simulasi 3D, AI professor, parameter, dan visual engine adaptif.</p>
               <div className="boot-progress">
                 <span />
               </div>
