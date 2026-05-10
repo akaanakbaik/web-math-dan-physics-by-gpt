@@ -7,7 +7,7 @@ export default function ResearchWall() {
   const lab = useLabStore((state) => state.getActiveLab());
 
   return (
-    <section className="research-wall">
+    <section id="research" className="research-wall">
       <div className="research-hero">
         <div>
           <p className="eyebrow">Frontier Zone</p>
