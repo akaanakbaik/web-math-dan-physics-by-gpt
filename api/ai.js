@@ -4,8 +4,8 @@ const aiEndpoint = process.env.AI_ENDPOINT || "https://api.siputzx.my.id/api/ai/
 
 const schema = z.object({
   prompt: z.string().min(1).max(6000),
-  system: z.string().min(1).max(3000).default("You are a helpful assistant for advanced mathematics and physics visualization."),
-  temperature: z.number().min(0).max(1.5).default(0.7),
+  system: z.string().min(1).max(3000).default("Kamu adalah profesor matematika dan fisika tingkat riset."),
+  temperature: z.number().min(0).max(1.5).default(0.55),
   section: z.string().max(120).optional(),
   formula: z.string().max(1000).optional(),
   mode: z.enum(["explain", "derive", "simulate", "challenge", "research"]).default("explain")
@@ -22,7 +22,7 @@ function getIp(req) {
 function rateLimit(ip) {
   const now = Date.now();
   const windowMs = 60_000;
-  const max = 30;
+  const max = 28;
   const current = buckets.get(ip) || { count: 0, reset: now + windowMs };
 
   if (now > current.reset) {
@@ -69,6 +69,109 @@ function send(res, status, payload) {
   res.setHeader("content-type", "application/json; charset=utf-8");
   res.setHeader("cache-control", "no-store");
   res.end(JSON.stringify(payload));
+}
+
+function extractText(data) {
+  return (
+    data?.data?.response ||
+    data?.response ||
+    data?.message ||
+    ""
+  );
+}
+
+function cleanAIText(value) {
+  let text = String(value || "").replace(/\r/g, "\n").trim();
+
+  text = text
+    .replace(/<think>[\s\S]*?<\/think>/gi, "")
+    .replace(/\*\*?analysis\*\*?:[\s\S]*?(?=\n\*\*?final|\nfinal|$)/gi, "")
+    .replace(/\bOkay,\s*/gi, "")
+    .replace(/\bAlright,\s*/gi, "")
+    .replace(/\bLet me\s+[^.?!]*[.?!]/gi, "")
+    .replace(/\bI need to\s+[^.?!]*[.?!]/gi, "")
+    .replace(/\bI should\s+[^.?!]*[.?!]/gi, "")
+    .replace(/\bThe user\s+[^.?!]*[.?!]/gi, "")
+    .replace(/\bFirst,\s+I\s+[^.?!]*[.?!]/gi, "");
+
+  const banned = [
+    "the user is asking",
+    "the user asks",
+    "i need to",
+    "i should",
+    "let me",
+    "i can",
+    "i will",
+    "we need to",
+    "okay,",
+    "alright,",
+    "hmm",
+    "since i can't",
+    "as an ai"
+  ];
+
+  const paragraphs = text
+    .split(/\n{2,}|\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter((line) => {
+      const lower = line.toLowerCase();
+      return !banned.some((item) => lower.startsWith(item) || lower.includes(item));
+    });
+
+  text = paragraphs.join("\n\n");
+
+  text = text
+    .replace(/\bvisualization\b/gi, "visualisasi")
+    .replace(/\banimation\b/gi, "animasi")
+    .replace(/\bsimulation\b/gi, "simulasi")
+    .replace(/\bequation\b/gi, "persamaan")
+    .replace(/\bformula\b/gi, "rumus")
+    .replace(/\bfield\b/gi, "medan")
+    .replace(/\bparticle\b/gi, "partikel")
+    .replace(/\bcurvature\b/gi, "kelengkungan")
+    .replace(/\bquantum\b/gi, "kuantum")
+    .replace(/\bgravity\b/gi, "gravitasi")
+    .replace(/\benergy\b/gi, "energi")
+    .trim();
+
+  if (!text) {
+    return "Inti\n\nAI belum memberikan jawaban final yang bersih. Coba kirim ulang pertanyaan dengan mode penjelasan yang lebih spesifik.";
+  }
+
+  if (!/Inti|Makna Rumus|Makna Visual|Interaksi|Catatan Riset/i.test(text)) {
+    text = `Inti\n\n${text}`;
+  }
+
+  return text;
+}
+
+function buildSystem(payload) {
+  return [
+    payload.system,
+    "WAJIB menjawab dalam bahasa Indonesia.",
+    "Tampilkan jawaban final saja.",
+    "Jangan tampilkan proses berpikir internal.",
+    "Jangan menulis analisis tersembunyi.",
+    "Jangan menulis kalimat seperti 'user bertanya', 'saya perlu', 'let me', 'I should', atau 'Okay'.",
+    "Gunakan format rapi: Inti, Makna Rumus, Makna Visual, Interaksi Slider, Catatan Riset.",
+    "Jawaban harus padat, ilmiah, jelas, dan bisa dipahami.",
+    "Hubungkan konsep dengan animasi 3D, simulasi, gerakan partikel, medan, slider, dan parameter.",
+    "Untuk masalah belum terpecahkan, pisahkan mana yang sudah diketahui dan mana yang masih terbuka.",
+    "Jangan mengarang klaim riset."
+  ].join("\n");
+}
+
+function buildPrompt(payload) {
+  return [
+    "Berikan jawaban final langsung dalam bahasa Indonesia.",
+    "Jangan tampilkan proses berpikir.",
+    `Mode: ${payload.mode}`,
+    payload.section ? `Bagian: ${payload.section}` : "",
+    payload.formula ? `Rumus aktif: ${payload.formula}` : "",
+    "Pertanyaan:",
+    payload.prompt
+  ].filter(Boolean).join("\n\n");
 }
 
 export default async function handler(req, res) {
@@ -126,25 +229,10 @@ export default async function handler(req, res) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 25000);
 
-  const system = [
-    payload.system,
-    "Jawab dalam bahasa Indonesia yang jelas.",
-    "Setiap konsep wajib dikaitkan dengan animasi, slider, parameter, dan interpretasi visual.",
-    "Untuk rumus sulit, jelaskan simbol, intuisi, batasan, dan eksperimen interaktif.",
-    "Jangan mengarang fakta penelitian yang belum pasti."
-  ].join("\n");
-
-  const prompt = [
-    `Mode: ${payload.mode}`,
-    payload.section ? `Bagian: ${payload.section}` : "",
-    payload.formula ? `Rumus: ${payload.formula}` : "",
-    payload.prompt
-  ].filter(Boolean).join("\n\n");
-
   try {
     const url = new URL(aiEndpoint);
-    url.searchParams.set("prompt", prompt);
-    url.searchParams.set("system", system);
+    url.searchParams.set("prompt", buildPrompt(payload));
+    url.searchParams.set("system", buildSystem(payload));
     url.searchParams.set("temperature", String(payload.temperature));
 
     const upstream = await fetch(url, {
@@ -169,9 +257,13 @@ export default async function handler(req, res) {
       };
     }
 
+    const cleaned = cleanAIText(extractText(data));
+
     send(res, upstream.ok ? 200 : upstream.status, {
       status: upstream.ok,
-      endpoint: aiEndpoint,
+      data: {
+        response: cleaned
+      },
       upstream: data,
       timestamp: new Date().toISOString()
     });
