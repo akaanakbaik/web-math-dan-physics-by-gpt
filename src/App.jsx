@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -13,7 +13,7 @@ export default function App() {
   const speed = useLabStore((state) => state.speed);
   const intensity = useLabStore((state) => state.intensity);
   const cinematic = useLabStore((state) => state.cinematic);
-  const [booting, setBooting] = React.useState(true);
+  const [booting, setBooting] = useState(true);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--sim-speed", String(Math.max(0.42, 2.6 - speed)));
