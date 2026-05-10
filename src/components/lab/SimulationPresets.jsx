@@ -8,57 +8,38 @@ const presets = [
     id: "stable",
     label: "Stabil",
     icon: Gauge,
-    intensity: 58,
-    speed: 0.8,
-    factor: 0.75
+    description: "Gerakan halus dan aman"
   },
   {
     id: "realistic",
     label: "Realistis",
     icon: Sparkles,
-    intensity: 72,
-    speed: 1,
-    factor: 1
+    description: "Seimbang dan natural"
   },
   {
     id: "chaos",
     label: "Chaos",
     icon: Waves,
-    intensity: 88,
-    speed: 1.35,
-    factor: 1.35
+    description: "Turbulen dan kompleks"
   },
   {
     id: "extreme",
     label: "Ekstrem",
     icon: Zap,
-    intensity: 100,
-    speed: 1.7,
-    factor: 1.7
+    description: "Energi maksimum"
   }
 ];
 
 export default function SimulationPresets() {
   const lab = useLabStore((state) => state.getActiveLab());
-  const parameters = useLabStore((state) => state.parameters);
-  const setParameter = useLabStore((state) => state.setParameter);
-  const setIntensity = useLabStore((state) => state.setIntensity);
-  const setSpeed = useLabStore((state) => state.setSpeed);
-  const intensity = useLabStore((state) => state.intensity);
+  const activePreset = useLabStore((state) => state.activePreset);
+  const applyPreset = useLabStore((state) => state.applyPreset);
 
-  function applyPreset(preset) {
-    setIntensity(preset.intensity);
-    setSpeed(preset.speed);
+  function selectPreset(preset) {
+    applyPreset(preset.id);
 
-    for (const item of lab.parameters) {
-      const current = parameters[item.key] ?? item.defaultValue;
-      const center = item.defaultValue;
-      const next = center + (current - center || (item.max - item.min) * 0.08) * preset.factor;
-      setParameter(item.key, Math.max(item.min, Math.min(item.max, next)));
-    }
-
-    toast.success(`Preset ${preset.label} aktif`, {
-      description: `Simulasi ${lab.title} disesuaikan ke mode ${preset.label.toLowerCase()}.`
+    toast.success(`Mode ${preset.label} aktif`, {
+      description: `${lab.title} memakai preset ${preset.description.toLowerCase()}.`
     });
   }
 
@@ -75,10 +56,10 @@ export default function SimulationPresets() {
       <div className="preset-grid">
         {presets.map((preset) => {
           const Icon = preset.icon;
-          const active = Math.abs(intensity - preset.intensity) < 4;
+          const active = activePreset === preset.id;
 
           return (
-            <button key={preset.id} className={cn(active && "active")} onClick={() => applyPreset(preset)}>
+            <button key={preset.id} className={cn(active && "active")} onClick={() => selectPreset(preset)} title={preset.description}>
               <Icon size={17} />
               <span>{preset.label}</span>
             </button>
