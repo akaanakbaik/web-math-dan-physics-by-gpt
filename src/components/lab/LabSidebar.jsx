@@ -18,7 +18,7 @@ function LabButton({ lab, active, onClick }) {
   return (
     <motion.button layout className={cn("lab-button", active && "active")} onClick={onClick}>
       <div className="lab-button-icon">
-        <Icon size={21} />
+        <Icon size={19} />
       </div>
       <div>
         <span>{lab.level}</span>
@@ -40,20 +40,20 @@ export default function LabSidebar() {
   const labs = getFilteredLabs();
 
   return (
-    <aside className="lab-sidebar">
+    <aside className="lab-sidebar compact-sidebar">
       <div className="sidebar-head">
         <div className="sidebar-orb">
-          <Sparkles size={20} />
+          <Sparkles size={18} />
         </div>
         <div>
           <span>Nexus Library</span>
-          <strong>{labs.length} modul aktif</strong>
+          <strong>{labs.length} modul</strong>
         </div>
       </div>
 
       <label className="search-box">
-        <Search size={18} />
-        <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Cari rumus, bidang, masalah..." />
+        <Search size={17} />
+        <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Cari modul..." />
       </label>
 
       <div className="category-scroll">
@@ -67,7 +67,7 @@ export default function LabSidebar() {
 
       <div className="level-radar">
         <div>
-          <SlidersHorizontal size={17} />
+          <SlidersHorizontal size={16} />
           <span>Tingkat Ilmiah</span>
         </div>
         <div className="level-list">
