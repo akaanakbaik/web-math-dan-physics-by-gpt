@@ -9,6 +9,7 @@ import ResearchWall from "@/components/lab/ResearchWall";
 import { useLabStore } from "@/store/useLabStore";
 import "@/styles/premium.css";
 import "@/styles/final.css";
+import "@/styles/polish.css";
 
 export default function App() {
   const speed = useLabStore((state) => state.speed);
