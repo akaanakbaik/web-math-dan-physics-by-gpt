@@ -14,9 +14,11 @@
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
     "start": "NODE_ENV=production node server/index.js",
+    "doctor": "node scripts/doctor.mjs",
+    "test:api": "node scripts/test-api.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "check": "npm run lint && npm run build"
+    "check": "npm run doctor && npm run lint && npm run build"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "latest",
