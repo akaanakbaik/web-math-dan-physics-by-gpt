@@ -1,0 +1,21 @@
+{
+  "name": "Nexus Axiom Lab",
+  "short_name": "Nexus Lab",
+  "description": "Website animasi matematika dan fisika tingkat lanjut dengan AI, simulasi 3D, formula explorer, dan research wall.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#07080b",
+  "theme_color": "#07080b",
+  "categories": ["education", "productivity", "science"],
+  "lang": "id-ID",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
