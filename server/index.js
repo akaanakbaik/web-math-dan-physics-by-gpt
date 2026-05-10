@@ -14,7 +14,7 @@ const app = express();
 const port = Number(process.env.PORT || 8787);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
-const aiEndpoint = "https://api.siputzx.my.id/api/ai/qwq32b";
+const aiEndpoint = process.env.AI_ENDPOINT || "https://api.siputzx.my.id/api/ai/qwq32b";
 
 const limiter = new RateLimiterMemory({
   points: 42,
@@ -62,6 +62,7 @@ app.get("/api/health", (req, res) => {
   res.json({
     status: true,
     name: "Nexus Axiom Lab API",
+    runtime: "express-local",
     uptime: process.uptime(),
     timestamp: new Date().toISOString()
   });
