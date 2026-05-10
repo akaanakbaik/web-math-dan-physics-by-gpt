@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Cpu, Gauge, MonitorCog, Pause, Play, RotateCcw, Sparkles, TabletSmartphone, Zap } from "lucide-react";
+import { Cpu, Gauge, MonitorCog, Pause, Play, RotateCcw, Sparkles, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useLabStore } from "@/store/useLabStore";
 import { formatNumber, getDeviceTier } from "@/lib/utils";
@@ -8,7 +8,6 @@ import NotificationCenter from "@/components/system/NotificationCenter";
 export default function SystemDock() {
   const lab = useLabStore((state) => state.getActiveLab());
   const paused = useLabStore((state) => state.paused);
-  const speed = useLabStore((state) => state.speed);
   const intensity = useLabStore((state) => state.intensity);
   const telemetry = useLabStore((state) => state.telemetry);
   const togglePaused = useLabStore((state) => state.togglePaused);
@@ -20,49 +19,47 @@ export default function SystemDock() {
   function reset() {
     resetParameters();
     toast.success("Sistem direset", {
-      description: "Render, parameter, dan simulasi kembali ke mode aman."
+      description: "Visual, parameter, dan simulasi kembali ke mode aman."
     });
   }
 
   return (
-    <motion.div className="system-dock" initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
-      <div className="dock-brand">
+    <motion.div className="system-dock refined-dock" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.38 }}>
+      <div className="dock-brand refined-brand">
         <div>
-          <Sparkles size={19} />
+          <Sparkles size={16} />
         </div>
         <section>
-          <span>Nexus Axiom</span>
-          <strong>{lab.level}</strong>
+          <span>Nexus</span>
+          <strong>{lab.title}</strong>
         </section>
       </div>
 
-      <div className="dock-metrics">
+      <div className="dock-metrics refined-dock-metrics">
         <div>
-          <Cpu size={17} />
+          <Cpu size={14} />
           <span>{tier}</span>
         </div>
         <div>
-          <Gauge size={17} />
+          <Gauge size={14} />
           <span>{formatNumber(telemetry.stability * 100)}%</span>
         </div>
         <div>
-          <Zap size={17} />
+          <Zap size={14} />
           <span>{formatNumber(intensity)}%</span>
-        </div>
-        <div>
-          <TabletSmartphone size={17} />
-          <span>{formatNumber(speed)}x</span>
         </div>
       </div>
 
-      <div className="dock-actions">
-        <button onClick={togglePaused}>{paused ? <Play size={17} /> : <Pause size={17} />}</button>
-        <button onClick={toggleCinematic}>
-          <MonitorCog size={17} />
-          <span>{cinematic ? "Cinema" : "Compact"}</span>
+      <div className="dock-actions refined-dock-actions">
+        <button onClick={togglePaused} aria-label={paused ? "Jalankan simulasi" : "Jeda simulasi"}>
+          {paused ? <Play size={15} /> : <Pause size={15} />}
         </button>
-        <button onClick={reset}>
-          <RotateCcw size={17} />
+        <button onClick={toggleCinematic} aria-label="Ubah mode tampilan">
+          <MonitorCog size={15} />
+          <span>{cinematic ? "Cinema" : "Mini"}</span>
+        </button>
+        <button onClick={reset} aria-label="Reset parameter">
+          <RotateCcw size={15} />
         </button>
         <NotificationCenter />
       </div>
