@@ -195,4 +195,203 @@ function GaugeNetwork({ lab, parameters, paused }) {
   if (lab.id !== "yang-mills-gap" && lab.id !== "p-vs-np-landscape" && lab.id !== "quantum-field-lattice") return null;
 
   return (
-    <group ref={ref
+    <group ref={ref}>
+      {lines.map((line, index) => (
+        <Line key={index} points={line} color="#ffffff" lineWidth={0.9} transparent opacity={0.18 + (index % 6) * 0.035} />
+      ))}
+      {nodes.map((node, index) => (
+        <Float key={node.id} speed={0.7 + (index % 5) * 0.05} rotationIntensity={0.2} floatIntensity={0.18}>
+          <mesh position={[node.x, node.y, node.z]} scale={0.075 + (index % 4) * 0.018}>
+            <icosahedronGeometry args={[1, 1]} />
+            <meshStandardMaterial color="#ffffff" roughness={0.23} metalness={0.65} transparent opacity={0.72} />
+          </mesh>
+        </Float>
+      ))}
+    </group>
+  );
+}
+
+function SpacetimeSheet({ lab, parameters, paused }) {
+  const group = useRef();
+
+  const sheet = useMemo(() => {
+    const size = getDeviceTier() === "low" ? 13 : 19;
+    const half = Math.floor(size / 2);
+    const rows = [];
+
+    for (let y = -half; y <= half; y += 1) {
+      const line = [];
+
+      for (let x = -half; x <= half; x += 1) {
+        const px = x * 0.34;
+        const py = y * 0.34;
+        const z = spacetimeCurvature(px, py, parameters.mass || 38, parameters.lambda || 0.7) * 0.1;
+        line.push([px, z, py]);
+      }
+
+      rows.push(line);
+    }
+
+    for (let x = -half; x <= half; x += 1) {
+      const line = [];
+
+      for (let y = -half; y <= half; y += 1) {
+        const px = x * 0.34;
+        const py = y * 0.34;
+        const z = spacetimeCurvature(px, py, parameters.mass || 38, parameters.lambda || 0.7) * 0.1;
+        line.push([px, z, py]);
+      }
+
+      rows.push(line);
+    }
+
+    return rows;
+  }, [parameters.mass, parameters.lambda]);
+
+  useFrame((state) => {
+    if (!group.current || paused) return;
+    const time = state.clock.elapsedTime;
+    group.current.rotation.y = Math.sin(time * 0.09) * 0.16;
+    group.current.position.y = Math.sin(time * 0.4) * 0.04;
+  });
+
+  if (lab.id !== "einstein-tensor-geometry" && lab.id !== "black-hole-information") return null;
+
+  return (
+    <group ref={group} rotation={[0.92, 0, 0]}>
+      {sheet.map((line, index) => (
+        <Line key={index} points={line} color="#ffffff" lineWidth={0.75} transparent opacity={0.22} />
+      ))}
+      <mesh position={[0, -0.18, 0]} scale={lab.id === "black-hole-information" ? 0.82 : 0.48}>
+        <sphereGeometry args={[1, 42, 42]} />
+        <meshStandardMaterial color="#05060a" roughness={0.18} metalness={0.78} />
+      </mesh>
+      <mesh position={[0, -0.18, 0]} scale={lab.id === "black-hole-information" ? 1.16 : 0.72}>
+        <torusGeometry args={[1, 0.025, 20, 128]} />
+        <meshStandardMaterial color="#f8fafc" roughness={0.2} metalness={0.7} transparent opacity={0.42} />
+      </mesh>
+    </group>
+  );
+}
+
+function FormulaHalo({ lab, paused }) {
+  const ref = useRef();
+  const Icon = lab.icon;
+
+  useFrame((state) => {
+    if (!ref.current || paused) return;
+    const time = state.clock.elapsedTime;
+    ref.current.rotation.y = time * 0.18;
+    ref.current.rotation.z = Math.sin(time * 0.2) * 0.16;
+  });
+
+  return (
+    <group ref={ref}>
+      <Float speed={paused ? 0 : 1.1} rotationIntensity={0.26} floatIntensity={0.36}>
+        <mesh scale={1.45}>
+          <icosahedronGeometry args={[1.15, 2]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.24} metalness={0.56} transparent opacity={0.18} wireframe />
+        </mesh>
+        <mesh scale={0.68}>
+          <sphereGeometry args={[1, 32, 32]} />
+          <meshPhysicalMaterial color="#f8fafc" roughness={0.18} metalness={0.35} transmission={0.1} transparent opacity={0.16} />
+        </mesh>
+        <Html center>
+          <div className="three-core-label refined">
+            <Icon size={24} />
+            <span>{lab.level}</span>
+          </div>
+        </Html>
+      </Float>
+    </group>
+  );
+}
+
+function SceneLighting({ paused }) {
+  return (
+    <>
+      <ambientLight intensity={0.62} />
+      <directionalLight position={[5, 6, 5]} intensity={1.55} />
+      <pointLight position={[-4, -2, -3]} intensity={0.8} />
+      <pointLight position={[0, 0, 4]} intensity={0.35} />
+      <Stars radius={90} depth={32} count={getDeviceTier() === "low" ? 450 : 950} factor={2.4} saturation={0} fade speed={paused ? 0 : 0.32} />
+    </>
+  );
+}
+
+function LabCore({ lab, parameters, intensity, paused }) {
+  return (
+    <>
+      <SceneLighting paused={paused} />
+      <RealisticParticleField lab={lab} parameters={parameters} intensity={intensity} paused={paused} />
+      <FlowLines lab={lab} parameters={parameters} paused={paused} />
+      <GaugeNetwork lab={lab} parameters={parameters} paused={paused} />
+      <SpacetimeSheet lab={lab} parameters={parameters} paused={paused} />
+      <FormulaHalo lab={lab} paused={paused} />
+      <OrbitControls enableZoom={false} enablePan={false} enableDamping dampingFactor={0.08} rotateSpeed={0.42} autoRotate={!paused} autoRotateSpeed={0.28} />
+    </>
+  );
+}
+
+export default function AdvancedField({ lab, parameters, intensity, paused, className }) {
+  const [failed, setFailed] = useState(false);
+  const supported = useMemo(() => typeof window !== "undefined" && hasWebGL(), []);
+  const metrics = useMemo(() => calculateLabMetrics(lab, parameters), [lab, parameters]);
+  const useFallback = failed || !supported;
+
+  if (useFallback) {
+    return (
+      <motion.div layout className={cn("advanced-field realistic-mode", className)}>
+        <WebGLFallback lab={lab} parameters={parameters} intensity={intensity} />
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div layout className={cn("advanced-field realistic-mode", className)}>
+      <div className="advanced-field-canvas">
+        <Canvas
+          dpr={getDeviceTier() === "low" ? [1, 1.2] : [1, 1.75]}
+          camera={{ position: [0, 0.35, 8.4], fov: 46 }}
+          gl={{ antialias: getDeviceTier() !== "low", powerPreference: "high-performance", alpha: true, stencil: false, depth: true }}
+          onCreated={({ gl }) => {
+            gl.setClearColor(0x000000, 0);
+            gl.getContext().canvas.addEventListener("webglcontextlost", () => setFailed(true));
+          }}
+          onError={() => setFailed(true)}
+        >
+          <Suspense fallback={null}>
+            <LabCore lab={lab} parameters={parameters} intensity={intensity} paused={paused} />
+          </Suspense>
+        </Canvas>
+      </div>
+
+      <div className="advanced-field-vignette" />
+
+      <div className="advanced-field-overlay refined-overlay">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={lab.id}
+            initial={{ opacity: 0, y: 14, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -14, filter: "blur(10px)" }}
+            className="field-title-card refined-title"
+          >
+            <p>{lab.field}</p>
+            <h2>{lab.title}</h2>
+            <span>{lab.short}</span>
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="metric-dock refined-metrics">
+          {metrics.map(([label, value]) => (
+            <div key={label}>
+              <span>{label}</span>
+              <strong>{value}</strong>
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
