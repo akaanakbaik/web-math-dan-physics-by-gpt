@@ -1,0 +1,364 @@
+.nexus-error-shell {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.1), transparent 28rem),
+    #07080b;
+  color: #f8fafc;
+  padding: 1rem;
+}
+
+.nexus-error-card {
+  width: min(100%, 640px);
+  display: grid;
+  gap: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 2rem;
+  background: rgba(18, 20, 27, 0.82);
+  padding: 2rem;
+  box-shadow: 0 34px 100px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(24px);
+}
+
+.nexus-error-card > div {
+  width: 4rem;
+  height: 4rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 1.3rem;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.nexus-error-card h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  letter-spacing: -0.06em;
+}
+
+.nexus-error-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.nexus-error-card pre {
+  max-height: 180px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: rgba(0, 0, 0, 0.24);
+  color: var(--soft);
+  padding: 1rem;
+  white-space: pre-wrap;
+}
+
+.nexus-error-card button {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 1rem;
+  background: #f8fafc;
+  color: #07080b;
+  padding: 0.8rem 1rem;
+  font-weight: 900;
+}
+
+.nexus-app.compact .hero-orbital {
+  display: none;
+}
+
+.nexus-app.compact .hero-section {
+  grid-template-columns: 1fr;
+}
+
+.nexus-app.compact .advanced-field,
+.nexus-app.compact .advanced-field-overlay {
+  min-height: 560px;
+}
+
+.nexus-app.compact .workspace-grid {
+  grid-template-columns: minmax(260px, 330px) minmax(0, 1fr);
+}
+
+.nexus-app.compact .workspace-right {
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@supports not (backdrop-filter: blur(20px)) {
+  .system-dock,
+  .lab-sidebar,
+  .parameter-matrix,
+  .ai-console,
+  .formula-explorer,
+  .meaning-panel,
+  .equation-board,
+  .complexity-panel,
+  .research-wall,
+  .field-title-card,
+  .notification-popover {
+    background: rgba(16, 18, 26, 0.96);
+  }
+}
+
+@media (hover: hover) {
+  .dock-actions button:hover,
+  .notification-toggle:hover,
+  .notification-trigger:hover,
+  .lab-button:hover,
+  .formula-item:hover,
+  .research-card:hover,
+  .hero-actions a:hover,
+  .category-pill:hover {
+    transform: translateY(-2px);
+  }
+
+  .research-card:hover,
+  .formula-item:hover,
+  .lab-button:hover {
+    border-color: var(--line-strong);
+  }
+}
+
+@media (max-width: 1500px) {
+  .nexus-app.compact .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-app.compact .workspace-right {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  html {
+    font-size: 15px;
+  }
+
+  .nexus-app,
+  .nexus-app.compact {
+    padding-bottom: 2rem;
+  }
+
+  .hero-section {
+    padding-top: 2rem;
+  }
+
+  .hero-main p {
+    font-size: 0.98rem;
+  }
+
+  .workspace-footer-note {
+    align-items: flex-start;
+  }
+
+  .advanced-field-canvas canvas {
+    touch-action: pan-y;
+  }
+
+  .research-card {
+    min-height: 160px;
+  }
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 22rem),
+      #07080b;
+  }
+
+  .nexus-app,
+  .nexus-app.compact {
+    width: min(100% - 0.6rem, 1840px);
+    padding-top: 10rem;
+  }
+
+  .system-dock {
+    border-radius: 1rem;
+  }
+
+  .dock-brand {
+    padding: 0.35rem;
+  }
+
+  .dock-brand > div {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .dock-actions button,
+  .notification-trigger,
+  .notification-toggle {
+    min-height: 2.2rem;
+    padding: 0.42rem 0.52rem;
+  }
+
+  .hero-kicker {
+    padding: 0.55rem 0.7rem;
+  }
+
+  .hero-main h1 {
+    letter-spacing: -0.07em;
+  }
+
+  .hero-main p {
+    line-height: 1.68;
+  }
+
+  .hero-orbital {
+    display: none;
+  }
+
+  .frontier-strip {
+    margin-left: -0.2rem;
+    margin-right: -0.2rem;
+  }
+
+  .workspace-title h2 {
+    font-size: 2.05rem;
+  }
+
+  .workspace-badges span {
+    padding: 0.5rem 0.62rem;
+  }
+
+  .lab-sidebar,
+  .parameter-matrix,
+  .ai-console,
+  .formula-explorer,
+  .meaning-panel,
+  .equation-board,
+  .complexity-panel,
+  .research-wall {
+    border-radius: 1.25rem;
+    padding: 0.8rem;
+  }
+
+  .advanced-field,
+  .advanced-field-overlay,
+  .nexus-app.compact .advanced-field,
+  .nexus-app.compact .advanced-field-overlay {
+    min-height: 420px;
+    border-radius: 1.25rem;
+  }
+
+  .advanced-field-overlay {
+    padding: 0.65rem;
+  }
+
+  .field-title-card {
+    border-radius: 1rem;
+  }
+
+  .field-title-card h2 {
+    font-size: 1.45rem;
+  }
+
+  .field-title-card span {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
+  .three-core-label {
+    transform: scale(0.82);
+  }
+
+  .metric-dock {
+    gap: 0.45rem;
+  }
+
+  .metric-dock div {
+    padding: 0.62rem;
+  }
+
+  .metric-dock span,
+  .equation-metrics span {
+    font-size: 0.64rem;
+  }
+
+  .metric-dock strong,
+  .equation-metrics strong {
+    font-size: 0.82rem;
+  }
+
+  .equation-board h2 {
+    font-size: 1.4rem;
+  }
+
+  .formula-list {
+    max-height: 220px;
+  }
+
+  .ai-answer {
+    max-height: 320px;
+  }
+
+  .notification-popover {
+    width: calc(100vw - 1rem);
+  }
+
+  .research-hero {
+    padding: 0.8rem;
+  }
+
+  .research-orbit {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .professor-note {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 390px) {
+  .nexus-app,
+  .nexus-app.compact {
+    padding-top: 11.6rem;
+  }
+
+  .dock-metrics div {
+    padding: 0.42rem 0.5rem;
+  }
+
+  .hero-main h1 {
+    font-size: 2.75rem;
+  }
+
+  .advanced-field,
+  .advanced-field-overlay,
+  .nexus-app.compact .advanced-field,
+  .nexus-app.compact .advanced-field-overlay {
+    min-height: 390px;
+  }
+
+  .field-title-card span {
+    -webkit-line-clamp: 2;
+  }
+
+  .metric-dock div {
+    padding: 0.52rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbital-ring,
+  .orbital-core,
+  .dot-a,
+  .dot-b,
+  .dot-c,
+  .boot-progress span {
+    animation: none !important;
+  }
+}
