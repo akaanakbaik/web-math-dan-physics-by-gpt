@@ -1,9 +1,19 @@
-import { useMemo, useRef } from "react";
+import { Suspense, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Html, Line, OrbitControls, Stars } from "@react-three/drei";
 import { motion, AnimatePresence } from "framer-motion";
 import { calculateLabMetrics, generateFieldPoints, hamiltonianPoint, navierVelocity, spacetimeCurvature, zetaApprox } from "@/lib/science";
 import { cn, getDeviceTier } from "@/lib/utils";
+import WebGLFallback from "@/components/visual/WebGLFallback";
+
+function hasWebGL() {
+  try {
+    const canvas = document.createElement("canvas");
+    return Boolean(window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl")));
+  } catch {
+    return false;
+  }
+}
 
 function LatticeParticles({ lab, parameters, intensity, paused }) {
   const group = useRef();
@@ -24,6 +34,7 @@ function LatticeParticles({ lab, parameters, intensity, paused }) {
         const t = performance.now() * 0.0008;
         const value = getPointValue(lab.id, point, t, parameters);
         const scale = 0.04 + Math.abs(value) * 0.06 + intensity * 0.0005;
+
         return (
           <mesh key={point.id} position={[point.x, point.y + value * 0.45, point.z]} scale={scale}>
             <sphereGeometry args={[1, 12, 12]} />
@@ -104,7 +115,7 @@ function GaugeNetwork({ lab, parameters, paused }) {
   );
 }
 
-function WaveRibbons({ lab, parameters, paused }) {
+function WaveRibbons({ lab, paused }) {
   const ref = useRef();
 
   useFrame((state) => {
@@ -153,7 +164,7 @@ function LabCore({ lab, parameters, intensity, paused }) {
       <Stars radius={80} depth={28} count={700} factor={2.2} saturation={0} fade speed={paused ? 0 : 0.4} />
       <LatticeParticles lab={lab} parameters={parameters} intensity={intensity} paused={paused} />
       <GaugeNetwork lab={lab} parameters={parameters} paused={paused} />
-      <WaveRibbons lab={lab} parameters={parameters} paused={paused} />
+      <WaveRibbons lab={lab} paused={paused} />
       <Float speed={paused ? 0 : 1.2} rotationIntensity={0.36} floatIntensity={0.42}>
         <mesh scale={1.35}>
           <icosahedronGeometry args={[1.2, 2]} />
@@ -172,13 +183,34 @@ function LabCore({ lab, parameters, intensity, paused }) {
 }
 
 export default function AdvancedField({ lab, parameters, intensity, paused, className }) {
+  const [failed, setFailed] = useState(false);
+  const supported = useMemo(() => typeof window !== "undefined" && hasWebGL(), []);
   const metrics = useMemo(() => calculateLabMetrics(lab, parameters), [lab, parameters]);
+  const useFallback = failed || !supported;
+
+  if (useFallback) {
+    return (
+      <motion.div layout className={cn("advanced-field", className)}>
+        <WebGLFallback lab={lab} parameters={parameters} intensity={intensity} />
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div layout className={cn("advanced-field", className)}>
       <div className="advanced-field-canvas">
-        <Canvas dpr={[1, 1.8]} camera={{ position: [0, 0, 8.5], fov: 48 }} gl={{ antialias: true, powerPreference: "high-performance", alpha: true }}>
-          <LabCore lab={lab} parameters={parameters} intensity={intensity} paused={paused} />
+        <Canvas
+          dpr={[1, 1.8]}
+          camera={{ position: [0, 0, 8.5], fov: 48 }}
+          gl={{ antialias: true, powerPreference: "high-performance", alpha: true }}
+          onCreated={({ gl }) => {
+            gl.getContext().canvas.addEventListener("webglcontextlost", () => setFailed(true));
+          }}
+          onError={() => setFailed(true)}
+        >
+          <Suspense fallback={null}>
+            <LabCore lab={lab} parameters={parameters} intensity={intensity} paused={paused} />
+          </Suspense>
         </Canvas>
       </div>
 
