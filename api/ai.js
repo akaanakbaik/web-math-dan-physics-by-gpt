@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const aiEndpoint = "https://api.siputzx.my.id/api/ai/qwq32b";
+const aiEndpoint = process.env.AI_ENDPOINT || "https://api.siputzx.my.id/api/ai/qwq32b";
 
 const schema = z.object({
   prompt: z.string().min(1).max(6000),
@@ -52,6 +52,7 @@ function readBody(req) {
 
     req.on("end", () => {
       if (!body) return resolve({});
+
       try {
         resolve(JSON.parse(body));
       } catch {
@@ -170,6 +171,7 @@ export default async function handler(req, res) {
 
     send(res, upstream.ok ? 200 : upstream.status, {
       status: upstream.ok,
+      endpoint: aiEndpoint,
       upstream: data,
       timestamp: new Date().toISOString()
     });
