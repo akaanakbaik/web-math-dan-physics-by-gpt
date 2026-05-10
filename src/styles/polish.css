@@ -1,0 +1,252 @@
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 0.52rem;
+  height: 0.52rem;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.34);
+}
+
+::selection {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.webgl-fallback {
+  position: relative;
+  min-height: inherit;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+.fallback-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.34;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+  background-size: 38px 38px;
+  mask-image: radial-gradient(circle at center, black, transparent 76%);
+  animation: fallbackGrid calc(18s * var(--sim-speed)) linear infinite;
+}
+
+.fallback-core {
+  position: relative;
+  z-index: 3;
+  width: min(68vw, 260px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.45rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.16), transparent 58%),
+    rgba(255, 255, 255, 0.055);
+  text-align: center;
+  box-shadow:
+    0 0 calc(var(--global-intensity, 72) * 0.65px) rgba(255, 255, 255, 0.12),
+    inset 0 0 48px rgba(255, 255, 255, 0.06);
+  animation: fallbackPulse calc(4.2s * var(--sim-speed)) ease-in-out infinite;
+}
+
+.fallback-core span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.fallback-core strong {
+  width: 75%;
+  font-size: clamp(0.95rem, 2vw, 1.2rem);
+}
+
+.fallback-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.fallback-particles i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(3px * var(--s));
+  height: calc(3px * var(--s));
+  border-radius: 999px;
+  background: #ffffff;
+  opacity: 0.62;
+  transform: translate(var(--x), var(--y));
+  animation: fallbackParticle calc(5s * var(--sim-speed)) ease-in-out infinite;
+  animation-delay: var(--d);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.55);
+}
+
+.fallback-info {
+  position: absolute;
+  z-index: 4;
+  top: 1rem;
+  left: 1rem;
+  width: min(calc(100% - 2rem), 440px);
+  border: 1px solid var(--line);
+  border-radius: 1.15rem;
+  background: rgba(8, 10, 14, 0.68);
+  padding: 0.8rem;
+  backdrop-filter: blur(18px);
+}
+
+.fallback-info div {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--soft);
+  font-weight: 800;
+}
+
+.fallback-info p {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 0.88rem;
+}
+
+.fallback-metrics {
+  position: absolute;
+  z-index: 4;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.6rem;
+}
+
+.fallback-metrics article,
+.fallback-status div {
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: rgba(8, 10, 14, 0.66);
+  padding: 0.75rem;
+  backdrop-filter: blur(16px);
+}
+
+.fallback-metrics span,
+.fallback-status span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.fallback-metrics strong,
+.fallback-status strong {
+  display: block;
+  margin-top: 0.28rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fallback-status {
+  position: absolute;
+  z-index: 4;
+  right: 1rem;
+  top: 1rem;
+  width: min(260px, calc(100% - 2rem));
+  display: grid;
+  gap: 0.55rem;
+}
+
+.fallback-status div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.fallback-status svg {
+  color: var(--soft);
+}
+
+.primary-button:focus-visible,
+.icon-button:focus-visible,
+.lab-button:focus-visible,
+.category-pill:focus-visible,
+.formula-item:focus-visible,
+.mode-grid button:focus-visible,
+.hero-actions a:focus-visible,
+.dock-actions button:focus-visible,
+.notification-trigger:focus-visible,
+.notification-toggle:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.75);
+  outline-offset: 3px;
+}
+
+@keyframes fallbackGrid {
+  to {
+    transform: translate3d(38px, 38px, 0);
+  }
+}
+
+@keyframes fallbackPulse {
+  0%,
+  100% {
+    transform: scale(0.97);
+  }
+
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+@keyframes fallbackParticle {
+  0%,
+  100% {
+    opacity: 0.25;
+    filter: blur(0px);
+  }
+
+  50% {
+    opacity: 0.9;
+    filter: blur(0.4px);
+  }
+}
+
+@media (max-width: 740px) {
+  .fallback-info {
+    position: relative;
+    inset: auto;
+    align-self: start;
+    width: 100%;
+  }
+
+  .fallback-status {
+    display: none;
+  }
+
+  .fallback-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .fallback-core {
+    width: min(62vw, 210px);
+  }
+}
