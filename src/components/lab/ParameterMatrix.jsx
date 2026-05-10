@@ -41,15 +41,15 @@ export default function ParameterMatrix() {
   }
 
   return (
-    <section className="parameter-matrix">
-      <div className="panel-head">
+    <section className="parameter-matrix compact-parameter">
+      <div className="panel-head compact-head">
         <div>
           <p className="eyebrow">Realtime Controller</p>
           <h2>Parameter Matrix</h2>
         </div>
         <div className="mini-actions">
-          <button className="icon-button" onClick={togglePaused}>{paused ? <Play size={18} /> : <Pause size={18} />}</button>
-          <button className="icon-button" onClick={reset}><RefreshCcw size={18} /></button>
+          <button className="icon-button" onClick={togglePaused}>{paused ? <Play size={17} /> : <Pause size={17} />}</button>
+          <button className="icon-button" onClick={reset}><RefreshCcw size={17} /></button>
         </div>
       </div>
 
@@ -72,12 +72,12 @@ export default function ParameterMatrix() {
 
       <div className="telemetry-grid">
         <div>
-          <Zap size={17} />
+          <Zap size={16} />
           <span>Energy</span>
           <strong>{formatNumber(telemetry.energy * 100)}%</strong>
         </div>
         <div>
-          <SlidersHorizontal size={17} />
+          <SlidersHorizontal size={16} />
           <span>Stability</span>
           <strong>{formatNumber(telemetry.stability * 100)}%</strong>
         </div>
