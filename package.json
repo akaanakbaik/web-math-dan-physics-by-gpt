@@ -15,6 +15,7 @@
     "preview": "vite preview --host 0.0.0.0",
     "start": "NODE_ENV=production node server/index.js",
     "doctor": "node scripts/doctor.mjs",
+    "audit:mobile": "node scripts/doctor.mjs && echo \"Mobile CSS audit ready. Test 360px, 390px, 412px, 430px, 768px, 820px.\"",
     "test:api": "node scripts/test-api.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
