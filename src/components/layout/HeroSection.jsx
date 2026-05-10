@@ -16,6 +16,7 @@ export default function HeroSection() {
   const selectLab = useLabStore((state) => state.selectLab);
   const tier = getDeviceTier();
   const featured = labModules.filter((item) => item.level === "Unsolved").slice(0, 4);
+  const ActiveIcon = lab.icon;
 
   return (
     <section className="hero-section">
@@ -61,7 +62,7 @@ export default function HeroSection() {
           <div className="orbital-ring ring-b" />
           <div className="orbital-ring ring-c" />
           <div className="orbital-core">
-            <lab.icon size={46} />
+            <ActiveIcon size={46} />
             <span>{lab.level}</span>
             <strong>{lab.title}</strong>
           </div>
