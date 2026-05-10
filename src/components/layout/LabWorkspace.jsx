@@ -5,6 +5,7 @@ import AdvancedField from "@/components/visual/AdvancedField";
 import ParameterMatrix from "@/components/lab/ParameterMatrix";
 import AiConsole from "@/components/ai/AiConsole";
 import FormulaExplorer from "@/components/lab/FormulaExplorer";
+import SimulationPresets from "@/components/lab/SimulationPresets";
 import { useLabStore } from "@/store/useLabStore";
 import { calculateLabMetrics } from "@/lib/science";
 
@@ -13,12 +14,12 @@ function MeaningPanel() {
 
   return (
     <section className="meaning-panel">
-      <div className="panel-head">
+      <div className="panel-head compact-head">
         <div>
           <p className="eyebrow">Motion Explanation</p>
           <h2>Makna Gerakan</h2>
         </div>
-        <BookOpenText size={24} />
+        <BookOpenText size={22} />
       </div>
 
       <div className="meaning-list">
@@ -39,7 +40,7 @@ function EquationBoard() {
   const metrics = calculateLabMetrics(lab, parameters);
 
   return (
-    <section className="equation-board">
+    <section className="equation-board refined-equation-board">
       <div>
         <p className="eyebrow">Active Equation</p>
         <h2>{lab.formula}</h2>
@@ -65,7 +66,7 @@ function ComplexityPanel() {
   return (
     <section className="complexity-panel">
       <div>
-        <Cpu size={22} />
+        <Cpu size={21} />
         <span>Render Intelligence</span>
       </div>
       <h3>{lab.field}</h3>
@@ -94,28 +95,28 @@ export default function LabWorkspace() {
 
   return (
     <section id="workspace" className="lab-workspace">
-      <div className="workspace-title">
+      <div className="workspace-title refined-workspace-title">
         <div>
           <p className="eyebrow">Interactive Research Workspace</p>
           <h2>Laboratorium Perbagian</h2>
         </div>
         <div className="workspace-badges">
           <span>
-            <Layers3 size={16} />
+            <Layers3 size={15} />
             Modular
           </span>
           <span>
-            <FunctionSquare size={16} />
-            Formula Driven
+            <FunctionSquare size={15} />
+            Formula
           </span>
           <span>
-            <Microscope size={16} />
+            <Microscope size={15} />
             Frontier
           </span>
         </div>
       </div>
 
-      <div className="workspace-grid">
+      <div className="workspace-grid refined-workspace-grid">
         <LabSidebar />
 
         <div className="workspace-center">
@@ -133,7 +134,8 @@ export default function LabWorkspace() {
           </div>
         </div>
 
-        <aside className="workspace-right">
+        <aside className="workspace-right refined-workspace-right">
+          <SimulationPresets />
           <ParameterMatrix />
           <AiConsole />
           <FormulaExplorer />
@@ -141,9 +143,9 @@ export default function LabWorkspace() {
       </div>
 
       <div className="workspace-footer-note">
-        <Sparkles size={18} />
+        <Sparkles size={17} />
         <span>
-          Setiap slider mengubah angka, animasi, metrik, dan penjelasan. Untuk deployment Vercel, nanti API AI akan dipindah ke serverless route agar cocok dengan Free Tier.
+          Semua slider mengubah angka, animasi, metrik, dan penjelasan. Mode realistis memakai instanced rendering agar partikel 3D tetap ringan.
         </span>
       </div>
     </section>
