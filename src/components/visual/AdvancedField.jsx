@@ -1,7 +1,8 @@
-import { Suspense, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Html, Line, OrbitControls, Stars } from "@react-three/drei";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import * as THREE from "three";
 import { calculateLabMetrics, generateFieldPoints, hamiltonianPoint, navierVelocity, spacetimeCurvature, zetaApprox } from "@/lib/science";
 import { cn, getDeviceTier } from "@/lib/utils";
 import WebGLFallback from "@/components/visual/WebGLFallback";
@@ -15,50 +16,27 @@ function hasWebGL() {
   }
 }
 
-function LatticeParticles({ lab, parameters, intensity, paused }) {
-  const group = useRef();
-  const tier = useMemo(() => getDeviceTier(), []);
-  const count = tier === "low" ? 64 : tier === "mid" ? 120 : 220;
-  const points = useMemo(() => generateFieldPoints(count, 5.2), [count]);
+function getParticleCount() {
+  const tier = getDeviceTier();
 
-  useFrame((state) => {
-    if (!group.current || paused) return;
-    const t = state.clock.elapsedTime;
-    group.current.rotation.y = t * 0.08;
-    group.current.rotation.x = Math.sin(t * 0.17) * 0.12;
-  });
-
-  return (
-    <group ref={group}>
-      {points.map((point, index) => {
-        const t = performance.now() * 0.0008;
-        const value = getPointValue(lab.id, point, t, parameters);
-        const scale = 0.04 + Math.abs(value) * 0.06 + intensity * 0.0005;
-
-        return (
-          <mesh key={point.id} position={[point.x, point.y + value * 0.45, point.z]} scale={scale}>
-            <sphereGeometry args={[1, 12, 12]} />
-            <meshStandardMaterial roughness={0.32} metalness={0.35} color={index % 2 ? "#f7f7f7" : "#b8c0cc"} transparent opacity={0.7} />
-          </mesh>
-        );
-      })}
-    </group>
-  );
+  if (tier === "low") return 90;
+  if (tier === "mid") return 170;
+  return 320;
 }
 
 function getPointValue(id, point, t, parameters) {
   if (id === "navier-stokes-singularity") {
     const flow = navierVelocity(point.x, point.y, t, parameters.viscosity, parameters.forcing);
-    return Math.sin(flow.speed + point.radius + t) * Math.min(flow.speed, 2);
+    return Math.sin(flow.speed + point.radius + t) * Math.min(flow.speed, 2.2);
   }
 
   if (id === "riemann-zeta-surface") {
-    const zeta = zetaApprox(parameters.real + point.x * 0.01, parameters.imaginary + point.y, 48);
-    return Math.sin(zeta.phase + t) * Math.min(zeta.magnitude, 2);
+    const zeta = zetaApprox(parameters.real + point.x * 0.01, parameters.imaginary + point.y, 54);
+    return Math.sin(zeta.phase + t) * Math.min(zeta.magnitude, 2.1);
   }
 
   if (id === "einstein-tensor-geometry") {
-    return spacetimeCurvature(point.x, point.y, parameters.mass, parameters.lambda) * 0.06;
+    return spacetimeCurvature(point.x, point.y, parameters.mass, parameters.lambda) * 0.075;
   }
 
   if (id === "hamiltonian-chaos-engine") {
@@ -68,7 +46,7 @@ function getPointValue(id, point, t, parameters) {
 
   if (id === "black-hole-information") {
     const r = Math.sqrt(point.x * point.x + point.y * point.y + point.z * point.z);
-    return -parameters.mass / (r * r + 12) + Math.sin(t * parameters.radiation + r) * 0.4;
+    return -parameters.mass / (r * r + 12) + Math.sin(t * parameters.radiation + r) * 0.52;
   }
 
   if (id === "protein-folding-energy") {
@@ -78,166 +56,143 @@ function getPointValue(id, point, t, parameters) {
   return Math.sin(point.x * (parameters.amplitude || 1) + point.y + t + (parameters.phase || 0)) * (parameters.coupling || 1);
 }
 
-function GaugeNetwork({ lab, parameters, paused }) {
-  const ref = useRef();
-  const nodes = useMemo(() => generateFieldPoints(28, 4), []);
+function RealisticParticleField({ lab, parameters, intensity, paused }) {
+  const mesh = useRef();
+  const glow = useRef();
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const count = useMemo(() => getParticleCount(), []);
+  const points = useMemo(() => generateFieldPoints(count, 5.4), [count]);
+  const colorA = useMemo(() => new THREE.Color("#ffffff"), []);
+  const colorB = useMemo(() => new THREE.Color("#9ca3af"), []);
+  const colorC = useMemo(() => new THREE.Color("#e5e7eb"), []);
+
+  useEffect(() => {
+    if (!mesh.current) return;
+
+    for (let index = 0; index < count; index += 1) {
+      mesh.current.setColorAt(index, index % 3 === 0 ? colorA : index % 3 === 1 ? colorB : colorC);
+    }
+
+    mesh.current.instanceColor.needsUpdate = true;
+  }, [count, colorA, colorB, colorC]);
 
   useFrame((state) => {
-    if (!ref.current || paused) return;
-    ref.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.2) * 0.2;
-    ref.current.rotation.y = state.clock.elapsedTime * 0.09;
+    if (!mesh.current || paused) return;
+
+    const time = state.clock.elapsedTime;
+    const pulse = 0.55 + intensity * 0.006;
+
+    for (let index = 0; index < count; index += 1) {
+      const point = points[index];
+      const value = getPointValue(lab.id, point, time * 0.75, parameters);
+      const orbit = time * (0.08 + (index % 9) * 0.003);
+      const radiusWave = 1 + Math.sin(time * 0.5 + index * 0.17) * 0.06;
+      const x = point.x * radiusWave + Math.cos(orbit + point.angle) * 0.12;
+      const y = point.y + value * 0.52 + Math.sin(time + index) * 0.018;
+      const z = point.z * radiusWave + Math.sin(orbit + point.angle) * 0.12;
+      const scale = 0.035 + Math.abs(value) * 0.046 + pulse * 0.025;
+
+      dummy.position.set(x, y, z);
+      dummy.scale.setScalar(scale);
+      dummy.rotation.set(time * 0.2 + index, time * 0.13, time * 0.08);
+      dummy.updateMatrix();
+      mesh.current.setMatrixAt(index, dummy.matrix);
+    }
+
+    mesh.current.instanceMatrix.needsUpdate = true;
+
+    if (glow.current) {
+      glow.current.rotation.y = time * 0.1;
+      glow.current.rotation.x = Math.sin(time * 0.16) * 0.18;
+      glow.current.scale.setScalar(1 + Math.sin(time * 1.2) * 0.025);
+    }
   });
+
+  return (
+    <group>
+      <instancedMesh ref={mesh} args={[null, null, count]} frustumCulled>
+        <sphereGeometry args={[1, 14, 14]} />
+        <meshStandardMaterial roughness={0.28} metalness={0.42} transparent opacity={0.82} />
+      </instancedMesh>
+
+      <group ref={glow}>
+        <mesh scale={2.15}>
+          <icosahedronGeometry args={[1, 3]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.18} metalness={0.62} transparent opacity={0.06} wireframe />
+        </mesh>
+        <mesh scale={1.38}>
+          <sphereGeometry args={[1, 32, 32]} />
+          <meshStandardMaterial color="#f8fafc" roughness={0.34} metalness={0.28} transparent opacity={0.08} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+function FlowLines({ lab, parameters, paused }) {
+  const group = useRef();
+
+  const lines = useMemo(() => {
+    const total = getDeviceTier() === "low" ? 8 : 14;
+
+    return Array.from({ length: total }, (_, row) => {
+      const offset = row - total / 2;
+
+      return Array.from({ length: 110 }, (_, index) => {
+        const x = (index - 55) * 0.105;
+        const t = index * 0.12;
+        const force = parameters.forcing || parameters.energy || parameters.coupling || 1;
+        const y = Math.sin(t + offset * 0.35) * 0.42 + offset * 0.18;
+        const z = Math.cos(t * 0.8 + force) * 0.55 + Math.sin(offset) * 0.4;
+
+        return [x, y, z];
+      });
+    });
+  }, [parameters]);
+
+  useFrame((state) => {
+    if (!group.current || paused) return;
+    const time = state.clock.elapsedTime;
+    group.current.rotation.y = Math.sin(time * 0.12) * 0.28;
+    group.current.rotation.x = Math.cos(time * 0.09) * 0.16;
+  });
+
+  if (!["navier-stokes-singularity", "maxwell-unification", "schrodinger-wave-packet", "protein-folding-energy"].includes(lab.id)) return null;
+
+  return (
+    <group ref={group}>
+      {lines.map((line, index) => (
+        <Line key={index} points={line} color={index % 2 ? "#ffffff" : "#cbd5e1"} lineWidth={index % 3 === 0 ? 1.35 : 0.85} transparent opacity={0.24 + (index % 5) * 0.04} />
+      ))}
+    </group>
+  );
+}
+
+function GaugeNetwork({ lab, parameters, paused }) {
+  const ref = useRef();
+  const nodes = useMemo(() => generateFieldPoints(38, 4.25), []);
 
   const lines = useMemo(() => {
     return nodes.slice(0, -1).map((node, index) => {
-      const next = nodes[(index + Math.round((parameters.topology || 5) % nodes.length)) % nodes.length];
+      const topology = Math.max(1, Math.round(parameters.topology || parameters.branching || 5));
+      const next = nodes[(index + topology) % nodes.length];
+      const middle = [(node.x + next.x) / 2, (node.y + next.y) / 2 + Math.sin(index) * 0.4, (node.z + next.z) / 2];
       return [
         [node.x, node.y, node.z],
+        middle,
         [next.x, next.y, next.z]
       ];
     });
-  }, [nodes, parameters.topology]);
-
-  if (lab.id !== "yang-mills-gap" && lab.id !== "p-vs-np-landscape") return null;
-
-  return (
-    <group ref={ref}>
-      {lines.map((line, index) => (
-        <Line key={index} points={line} color="#f3f4f6" lineWidth={1} transparent opacity={0.25 + (index % 5) * 0.05} />
-      ))}
-      {nodes.map((node, index) => (
-        <mesh key={node.id} position={[node.x, node.y, node.z]} scale={0.08 + (index % 4) * 0.025}>
-          <icosahedronGeometry args={[1, 0]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.22} metalness={0.55} transparent opacity={0.7} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-function WaveRibbons({ lab, paused }) {
-  const ref = useRef();
+  }, [nodes, parameters.topology, parameters.branching]);
 
   useFrame((state) => {
     if (!ref.current || paused) return;
-    ref.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.25) * 0.18;
-    ref.current.rotation.z = Math.cos(state.clock.elapsedTime * 0.15) * 0.08;
+    const time = state.clock.elapsedTime;
+    ref.current.rotation.z = Math.sin(time * 0.17) * 0.22;
+    ref.current.rotation.y = time * 0.075;
   });
 
-  const curves = useMemo(() => {
-    return Array.from({ length: 7 }, (_, row) =>
-      Array.from({ length: 90 }, (_, index) => {
-        const x = (index - 45) * 0.12;
-        const phase = row * 0.7;
-        const y = Math.sin(index * 0.2 + phase) * 0.55 + (row - 3) * 0.32;
-        const z = Math.cos(index * 0.17 + phase) * 0.8;
-        return [x, y, z];
-      })
-    );
-  }, []);
-
-  if (lab.id !== "maxwell-unification" && lab.id !== "schrodinger-wave-packet") return null;
+  if (lab.id !== "yang-mills-gap" && lab.id !== "p-vs-np-landscape" && lab.id !== "quantum-field-lattice") return null;
 
   return (
-    <group ref={ref}>
-      {curves.map((curve, index) => (
-        <Line key={index} points={curve} color={index % 2 ? "#ffffff" : "#cbd5e1"} lineWidth={index % 2 ? 1.2 : 0.8} transparent opacity={0.34 + index * 0.045} />
-      ))}
-      <Float speed={1.6} rotationIntensity={0.4} floatIntensity={0.5}>
-        <mesh scale={1.2}>
-          <torusKnotGeometry args={[1.1, 0.045, 180, 8]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.2} metalness={0.45} transparent opacity={0.58} />
-        </mesh>
-      </Float>
-    </group>
-  );
-}
-
-function LabCore({ lab, parameters, intensity, paused }) {
-  const Icon = lab.icon;
-
-  return (
-    <>
-      <ambientLight intensity={0.85} />
-      <pointLight position={[4, 5, 5]} intensity={1.4} />
-      <pointLight position={[-5, -3, -4]} intensity={0.6} />
-      <Stars radius={80} depth={28} count={700} factor={2.2} saturation={0} fade speed={paused ? 0 : 0.4} />
-      <LatticeParticles lab={lab} parameters={parameters} intensity={intensity} paused={paused} />
-      <GaugeNetwork lab={lab} parameters={parameters} paused={paused} />
-      <WaveRibbons lab={lab} paused={paused} />
-      <Float speed={paused ? 0 : 1.2} rotationIntensity={0.36} floatIntensity={0.42}>
-        <mesh scale={1.35}>
-          <icosahedronGeometry args={[1.2, 2]} />
-          <meshStandardMaterial color="#f8fafc" roughness={0.26} metalness={0.5} transparent opacity={0.2} wireframe />
-        </mesh>
-        <Html center>
-          <div className="three-core-label">
-            <Icon size={28} />
-            <span>{lab.level}</span>
-          </div>
-        </Html>
-      </Float>
-      <OrbitControls enableZoom={false} enablePan={false} autoRotate={!paused} autoRotateSpeed={0.35} />
-    </>
-  );
-}
-
-export default function AdvancedField({ lab, parameters, intensity, paused, className }) {
-  const [failed, setFailed] = useState(false);
-  const supported = useMemo(() => typeof window !== "undefined" && hasWebGL(), []);
-  const metrics = useMemo(() => calculateLabMetrics(lab, parameters), [lab, parameters]);
-  const useFallback = failed || !supported;
-
-  if (useFallback) {
-    return (
-      <motion.div layout className={cn("advanced-field", className)}>
-        <WebGLFallback lab={lab} parameters={parameters} intensity={intensity} />
-      </motion.div>
-    );
-  }
-
-  return (
-    <motion.div layout className={cn("advanced-field", className)}>
-      <div className="advanced-field-canvas">
-        <Canvas
-          dpr={[1, 1.8]}
-          camera={{ position: [0, 0, 8.5], fov: 48 }}
-          gl={{ antialias: true, powerPreference: "high-performance", alpha: true }}
-          onCreated={({ gl }) => {
-            gl.getContext().canvas.addEventListener("webglcontextlost", () => setFailed(true));
-          }}
-          onError={() => setFailed(true)}
-        >
-          <Suspense fallback={null}>
-            <LabCore lab={lab} parameters={parameters} intensity={intensity} paused={paused} />
-          </Suspense>
-        </Canvas>
-      </div>
-
-      <div className="advanced-field-overlay">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={lab.id}
-            initial={{ opacity: 0, y: 14, filter: "blur(10px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            exit={{ opacity: 0, y: -14, filter: "blur(10px)" }}
-            className="field-title-card"
-          >
-            <p>{lab.field}</p>
-            <h2>{lab.title}</h2>
-            <span>{lab.short}</span>
-          </motion.div>
-        </AnimatePresence>
-
-        <div className="metric-dock">
-          {metrics.map(([label, value]) => (
-            <div key={label}>
-              <span>{label}</span>
-              <strong>{value}</strong>
-            </div>
-          ))}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
+    <group ref={ref
